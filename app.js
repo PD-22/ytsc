@@ -25,13 +25,7 @@ add go to the end
 (function () {
     'use strict';
 
-    // Variables
-    const state = {
-        videoId: getVideoId(),
-        start: null,
-        end: null,
-        programActive: false,
-    }
+    let state;
 
     class Action {
         constructor(name, key, action, alwaysEnabled) {
@@ -49,7 +43,7 @@ add go to the end
             log(formatActions(), 3000);
         } else {
             log("Shortcuts disabled");
-            resetProgram();
+            // initializeProgram();
         }
     }, true);
 
@@ -76,10 +70,23 @@ add go to the end
 
     const actions = [toggleShortcuts, saveStart, loadStart, saveLoop, clearLoop];
 
-    // Initial log message
     console.log(`Press "${toggleShortcuts.key}" to toggle video shortcuts`);
+    initialize();
 
-    initEventListeners();
+    function initialize() {
+        console.log("initializeProgram"); // TEMP
+        state = initState();
+        initEventListeners();
+    }
+
+    function initState() {
+        return {
+            videoId: getVideoId(),
+            start: null,
+            end: null,
+            programActive: false,
+        };
+    }
 
     function initEventListeners() {
         getVideo().removeEventListener('timeupdate', segmentLoopHandler);
@@ -119,14 +126,7 @@ add go to the end
 
     function videoChangedHandler() {
         if (state.videoId != getVideoId()) return;
-        resetProgram();
-    }
-
-    // Functions
-    function resetProgram() {
-        state.start = null;
-        state.end = null;
-        state.programActive = false;
+        initialize();
     }
 
     function formatActions() {
