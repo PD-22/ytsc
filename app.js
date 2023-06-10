@@ -112,9 +112,9 @@ add go to the end
     function segmentLoopHandler() {
         if (!state.programActive) return;
         if (!state.end || getVideo().currentTime < state.end) return;
-        console.log(`Segment end (${formatDuration(getVideo().currentTime)})`);
+        const endTime = formatDuration(getVideo().currentTime);
         getVideo().currentTime = state.start;
-        console.log(`Load start (${formatDuration(state.start)})`);
+        console.log(`Segment end (${endTime})\nLoad start (${formatDuration(state.start)})`);
     }
 
     function videoChangedHandler() {
