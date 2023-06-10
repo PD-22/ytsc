@@ -107,18 +107,18 @@ add go to the end
     }
 
     function initEventListeners() {
-        getVideo().removeEventListener('timeupdate', segmentLoopHandler);
-        getVideo().addEventListener('timeupdate', segmentLoopHandler);
+        getVideo().removeEventListener('timeupdate', segmentListener);
+        getVideo().addEventListener('timeupdate', segmentListener);
 
-        document.removeEventListener('keyup', keyHandler);
-        document.addEventListener('keyup', keyHandler);
+        document.removeEventListener('keyup', keyListener);
+        document.addEventListener('keyup', keyListener);
 
-        window.removeEventListener('yt-navigate-finish', videoChangedHandler);
-        window.addEventListener('yt-navigate-finish', videoChangedHandler);
+        window.removeEventListener('yt-navigate-finish', videoChangedListener);
+        window.addEventListener('yt-navigate-finish', videoChangedListener);
     }
 
-    // Event Handlers
-    function keyHandler(event) {
+    //#region listener
+    function keyListener(event) {
         if (keyModifierPressed(event)) return;
 
         getActiveActions().forEach(action => action.action());
@@ -134,7 +134,7 @@ add go to the end
         }
     }
 
-    function segmentLoopHandler() {
+    function segmentListener() {
         if (!state.programActive) return;
         if (!state.end || getVideo().currentTime < state.end) return;
         const endTime = formatDuration(getVideo().currentTime);
@@ -142,11 +142,13 @@ add go to the end
         console.log(`Segment end (${endTime})\nLoad start (${formatDuration(state.start)})`);
     }
 
-    function videoChangedHandler() {
+    function videoChangedListener() {
         if (state.videoId != getVideoId()) return;
         initialize();
     }
+    //#endregion
 
+    //#region formatters
     function formatActions() {
         return [
             'Shortcuts enabled:',
@@ -163,12 +165,9 @@ add go to the end
         const seconds = Math.floor(totalSeconds % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
+    //#endregion
 
-    function log(text, duration) {
-        console.log(text);
-        alert(text, duration);
-    }
-
+    //#region video
     function getVideo() {
         return document.querySelector('video');
     }
@@ -179,6 +178,16 @@ add go to the end
 
     function getVideoId() {
         return new URLSearchParams(window.location.search).get('v');
+    }
+    //#endregion
+
+    function log(text, duration) {
+        console.log(text);
+        alert(text, duration);
+    }
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async function alert(message, duration = 1000) {
@@ -211,9 +220,5 @@ add go to the end
         alertBox.style.opacity = '0';
         await delay(animationDuration);
         getVideoContainer().removeChild(alertBox);
-    }
-
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 })();
