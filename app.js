@@ -10,7 +10,25 @@
 
 /*
 TODO:
-group listeners and state
+when page loads:
+    console log toggleShortcuts key
+    start listening for toggleShortcuts only
+when toggleShortcuts activates the program:
+    initialize state
+    add change video listener
+    add key listener
+    add loop listener
+when toggleShortcuts deactivates the program:
+    clear state
+    remove change video listener
+    remove key listener
+    remove loop listener
+when video changes:
+    reset loop listener
+    reset state
+    alert log shortcuts disabled
+    console log toggleShortcuts key
+
 make program active per video
 separate program per video
     enable only if the video exists
