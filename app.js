@@ -10,24 +10,10 @@
 
 /*
 TODO:
-when page loads:
-    console log toggleShortcuts key
-    start listening for toggleShortcuts only
-when toggleShortcuts activates the program:
-    initialize state
-    add change video listener
-    add key listener
-    add loop listener
-when toggleShortcuts deactivates the program:
-    clear state
-    remove change video listener
-    remove key listener
-    remove loop listener
-when video changes:
-    reset loop listener
-    reset state
-    alert log shortcuts disabled
-    console log toggleShortcuts key
+fix activation deactivation triggered together
+
+fix video changed listener
+exit program on video change
 
 make program active per video
 separate program per video
@@ -43,27 +29,31 @@ add go to the end
 (function () {
     'use strict';
 
-    let state;
+    let state = clearState();
 
     class Action {
-        constructor(name, key, action, alwaysEnabled) {
+        constructor(name, key, action) {
             this.name = name;
             this.key = key;
             this.action = action;
-            this.alwaysEnabled = alwaysEnabled;
         }
     }
 
     //#region Actions
-    const toggleShortcuts = new Action('Toggle shortcuts', '`', function () {
-        state.programActive = !state.programActive;
-        if (state.programActive) {
-            log(formatActions(), 3000);
-        } else {
-            log("Shortcuts disabled");
-            // initializeProgram();
-        }
-    }, true);
+    const activateShortcuts = new Action('Activate program', '`', function () {
+        state = initState();
+        initListeners();
+        removeActivationListener()
+        log(formatActions());
+    });
+
+    const deactivateShortcuts = new Action('Deactivate program', '`', function () {
+        // order is important
+        clearListeners();
+        addActivationListener()
+        state = clearState();
+        log("Shortcuts disabled");
+    });
 
     const saveStart = new Action('Save start', 'a', function () {
         state.start = getVideo().currentTime;
@@ -86,56 +76,85 @@ add go to the end
     });
     //#endregion
 
-    const actions = [toggleShortcuts, saveStart, loadStart, saveLoop, clearLoop];
+    const actions = [deactivateShortcuts, saveStart, loadStart, saveLoop, clearLoop];
 
-    console.log(`Press "${toggleShortcuts.key}" to toggle video shortcuts`);
-    initialize();
+    run();
 
-    function initialize() {
-        console.log("initializeProgram"); // TEMP
-        state = initState();
-        initEventListeners();
+    //#region run
+    function run() {
+        console.log(`Press "${activateShortcuts.key}" to activate video shortcuts`);
+        addActivationListener();
     }
 
+    function addActivationListener() {
+        console.log("addActivationListener");
+        document.addEventListener('keyup', activationListener);
+    }
+
+    function removeActivationListener() {
+        console.log("removeActivationListener");
+        document.addEventListener('keyup', activationListener);
+    }
+
+    function activationListener(event) {
+        if (!eventMatches(event, activateShortcuts)) return;
+        activateShortcuts.action();
+    }
+    //#endregion
+
+    //#region state
     function initState() {
         return {
-            videoId: getVideoId(),
             start: null,
             end: null,
-            programActive: false,
+            video: {
+                id: getVideoId(),
+                element: getVideo(),
+                container: getVideoContainer()
+            }
         };
     }
 
-    function initEventListeners() {
-        getVideo().removeEventListener('timeupdate', segmentListener);
-        getVideo().addEventListener('timeupdate', segmentListener);
-
-        document.removeEventListener('keyup', keyListener);
-        document.addEventListener('keyup', keyListener);
-
-        window.removeEventListener('yt-navigate-finish', videoChangedListener);
-        window.addEventListener('yt-navigate-finish', videoChangedListener);
+    function clearState() {
+        return null
     }
+    //#endregion
 
     //#region listener
-    function keyListener(event) {
-        if (keyModifierPressed(event)) return;
+    function initListeners() {
+        document.addEventListener('keyup', keyListener);
+        state.video.element.addEventListener('timeupdate', segmentListener);
+        // window.addEventListener('yt-navigate-finish', videoChangedListener);
+    }
 
+    function clearListeners() {
+        document.removeEventListener('keyup', keyListener);
+        state.video.element.removeEventListener('timeupdate', segmentListener);
+        // window.removeEventListener('yt-navigate-finish', videoChangedListener);
+    }
+
+    function keyListener(event) {
         getActiveActions().forEach(action => action.action());
 
         function getActiveActions() {
-            let result = actions.filter(opt => opt.key === event.key.toLowerCase());
-            if (!state.programActive) result = result.filter(opt => opt.alwaysEnabled);
-            return result;
+            return actions.filter(action => eventMatches(event, action));
         }
+    }
+
+    function eventMatches(event, action) {
+        return !keyModifierPressed(event) && keyMatches(event, action);
 
         function keyModifierPressed(event) {
             return event.shiftKey || event.ctrlKey || event.altKey || event.metaKey;
         }
+
+        function keyMatches(event, action) {
+            return event.key.toLowerCase() === action.key;
+        }
     }
 
+    // TODO: update log text
     function segmentListener() {
-        if (!state.programActive) return;
         if (!state.end || getVideo().currentTime < state.end) return;
         const endTime = formatDuration(getVideo().currentTime);
         getVideo().currentTime = state.start;
@@ -143,8 +162,10 @@ add go to the end
     }
 
     function videoChangedListener() {
+        console.log("videoChangedListener: start");
         if (state.videoId != getVideoId()) return;
-        initialize();
+        console.log("videoChangedListener: true");
+        // TODO
     }
     //#endregion
 
