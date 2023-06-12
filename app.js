@@ -10,14 +10,8 @@
 
 /*
 TODO:
-fix video changed listener
-exit program on video change
-
-make program active per video
-separate program per video
-    enable only if the video exists
-    fix loop still exists when opening different video
-    fix if no video display at the center
+add less general logs
+disable go to start if start falsy
 fix loop before start
 when loop stop transfer video to the end of the loop
 save start and loop in localstorage
@@ -41,20 +35,20 @@ add go to the end
     const activateShortcuts = new Action('Activate program', '`', function () {
         state = initState();
         if (state) {
-            addActionListeners();
             removeSystemListeners();
-            log(formatActions());
+            addActionListeners();
+            log(formatActions(), 3000);
         } else {
             log("Program activation failed");
         }
     });
 
     const deactivateShortcuts = new Action('Deactivate program', '`', function () {
-        // clear state after removing action listeners
         removeActionListeners();
         addSystemListeners();
+        log("Shortcuts disabled", 3000);
+        // clear state at the end
         state = clearState();
-        log("Shortcuts disabled");
     });
 
     const saveStart = new Action('Save start', 'a', function () {
@@ -113,16 +107,12 @@ add go to the end
     }
 
     function initVideo() {
-        const id = getVideoId();
+        const id = getUrlVideoId();
         const element = getVideoElement();
         const container = getVideoContainer();
 
         const success = [id, element, container].every(x => Boolean(x));
         return success ? { id, element, container } : clearVideo();
-
-        function getVideoId() {
-            return new URLSearchParams(window.location.search).get('v');
-        }
 
         function getVideoElement() {
             return document.querySelector('video.html5-main-video');
@@ -131,6 +121,10 @@ add go to the end
         function getVideoContainer() {
             return getVideoElement()?.parentElement?.parentElement;
         }
+    }
+
+    function getUrlVideoId() {
+        return new URLSearchParams(window.location.search).get('v');
     }
 
     function clearVideo() {
@@ -142,13 +136,13 @@ add go to the end
     function addActionListeners() {
         document.addEventListener('keyup', keyListener);
         state.video.element.addEventListener('timeupdate', segmentListener);
-        // window.addEventListener('yt-navigate-finish', videoChangedListener);
+        document.addEventListener('yt-navigate-finish', videoChangedListener);
     }
 
     function removeActionListeners() {
         document.removeEventListener('keyup', keyListener);
         state.video.element.removeEventListener('timeupdate', segmentListener);
-        // window.removeEventListener('yt-navigate-finish', videoChangedListener);
+        document.removeEventListener('yt-navigate-finish', videoChangedListener);
     }
 
     function keyListener(event) {
@@ -179,9 +173,8 @@ add go to the end
     }
 
     function videoChangedListener() {
-        console.log("videoChangedListener: start");
-        if (state.videoId != state.video.id) return;
-        console.log("videoChangedListener: true");
+        const idChanged = state.video.id != getUrlVideoId();
+        if (idChanged) deactivateShortcuts.action();
     }
     //#endregion
 
