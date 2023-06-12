@@ -10,6 +10,8 @@
 
 /*
 TODO:
+fix systemListener not removed
+
 fix activation deactivation triggered together
 
 fix video changed listener
@@ -42,15 +44,15 @@ add go to the end
     //#region Actions
     const activateShortcuts = new Action('Activate program', '`', function () {
         state = initState();
-        initListeners();
-        removeActivationListener()
+        addActionListeners();
+        removeSystemListeners();
         log(formatActions());
     });
 
     const deactivateShortcuts = new Action('Deactivate program', '`', function () {
         // order is important
-        clearListeners();
-        addActivationListener()
+        removeActionListeners();
+        addSystemListeners();
         state = clearState();
         log("Shortcuts disabled");
     });
@@ -83,20 +85,20 @@ add go to the end
     //#region run
     function run() {
         console.log(`Press "${activateShortcuts.key}" to activate video shortcuts`);
-        addActivationListener();
+        addSystemListeners();
     }
 
-    function addActivationListener() {
-        console.log("addActivationListener");
-        document.addEventListener('keyup', activationListener);
+    function addSystemListeners() {
+        console.log("addSystemListeners");
+        document.addEventListener('keyup', systemListener);
     }
 
-    function removeActivationListener() {
-        console.log("removeActivationListener");
-        document.addEventListener('keyup', activationListener);
+    function removeSystemListeners() {
+        console.log("removeSystemListeners");
+        document.addEventListener('keyup', systemListener);
     }
 
-    function activationListener(event) {
+    function systemListener(event) {
         if (!eventMatches(event, activateShortcuts)) return;
         activateShortcuts.action();
     }
@@ -121,13 +123,13 @@ add go to the end
     //#endregion
 
     //#region listener
-    function initListeners() {
+    function addActionListeners() {
         document.addEventListener('keyup', keyListener);
         state.video.element.addEventListener('timeupdate', segmentListener);
         // window.addEventListener('yt-navigate-finish', videoChangedListener);
     }
 
-    function clearListeners() {
+    function removeActionListeners() {
         document.removeEventListener('keyup', keyListener);
         state.video.element.removeEventListener('timeupdate', segmentListener);
         // window.removeEventListener('yt-navigate-finish', videoChangedListener);
