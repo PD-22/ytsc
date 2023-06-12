@@ -40,9 +40,13 @@ add go to the end
     //#region Actions
     const activateShortcuts = new Action('Activate program', '`', function () {
         state = initState();
-        addActionListeners();
-        removeSystemListeners();
-        log(formatActions());
+        if (state) {
+            addActionListeners();
+            removeSystemListeners();
+            log(formatActions());
+        } else {
+            log("Program activation failed");
+        }
     });
 
     const deactivateShortcuts = new Action('Deactivate program', '`', function () {
@@ -54,18 +58,18 @@ add go to the end
     });
 
     const saveStart = new Action('Save start', 'a', function () {
-        state.start = getVideo().currentTime;
-        log(`${this.name} (${formatDuration(getVideo().currentTime)})`);
+        state.start = state.video.element.currentTime;
+        log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
     });
 
     const loadStart = new Action('Load start', 's', function () {
-        getVideo().currentTime = state.start;
+        state.video.element.currentTime = state.start;
         log(`${this.name} (${formatDuration(state.start)})`);
     });
 
     const saveLoop = new Action('Save loop', 'd', function () {
-        state.end = getVideo().currentTime;
-        log(`${this.name} (${formatDuration(getVideo().currentTime)})`);
+        state.end = state.video.element.currentTime;
+        log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
     });
 
     const clearLoop = new Action('Clear Loop', 'w', function () {
@@ -100,18 +104,36 @@ add go to the end
 
     //#region state
     function initState() {
-        return {
-            start: null,
-            end: null,
-            video: {
-                id: getVideoId(),
-                element: getVideo(),
-                container: getVideoContainer()
-            }
-        };
+        const video = initVideo();
+        return video ? { video, start: null, end: null } : clearState();
     }
 
     function clearState() {
+        return null
+    }
+
+    function initVideo() {
+        const id = getVideoId();
+        const element = getVideoElement();
+        const container = getVideoContainer();
+
+        const success = [id, element, container].every(x => Boolean(x));
+        return success ? { id, element, container } : clearVideo();
+
+        function getVideoId() {
+            return new URLSearchParams(window.location.search).get('v');
+        }
+
+        function getVideoElement() {
+            return document.querySelector('video.html5-main-video');
+        }
+
+        function getVideoContainer() {
+            return getVideoElement()?.parentElement?.parentElement;
+        }
+    }
+
+    function clearVideo() {
         return null
     }
     //#endregion
@@ -149,19 +171,17 @@ add go to the end
         }
     }
 
-    // TODO: update log text
     function segmentListener() {
-        if (!state.end || getVideo().currentTime < state.end) return;
-        const endTime = formatDuration(getVideo().currentTime);
-        getVideo().currentTime = state.start;
+        if (!state.end || state.video.element.currentTime < state.end) return;
+        const endTime = formatDuration(state.video.element.currentTime);
+        state.video.element.currentTime = state.start;
         console.log(`Segment end (${endTime})\nLoad start (${formatDuration(state.start)})`);
     }
 
     function videoChangedListener() {
         console.log("videoChangedListener: start");
-        if (state.videoId != getVideoId()) return;
+        if (state.videoId != state.video.id) return;
         console.log("videoChangedListener: true");
-        // TODO
     }
     //#endregion
 
@@ -181,20 +201,6 @@ add go to the end
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = Math.floor(totalSeconds % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
-    //#endregion
-
-    //#region video
-    function getVideo() {
-        return document.querySelector('video');
-    }
-
-    function getVideoContainer() {
-        return getVideo().parentElement.parentElement;
-    }
-
-    function getVideoId() {
-        return new URLSearchParams(window.location.search).get('v');
     }
     //#endregion
 
@@ -231,11 +237,12 @@ add go to the end
             zIndex: '9999'
         });
 
-        getVideoContainer().appendChild(alertBox);
+        const alertContainer = state?.video?.container || document.body;
+        alertContainer.appendChild(alertBox);
 
         await delay(duration);
         alertBox.style.opacity = '0';
         await delay(animationDuration);
-        getVideoContainer().removeChild(alertBox);
+        alertContainer.removeChild(alertBox);
     }
 })();
