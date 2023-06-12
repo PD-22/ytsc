@@ -10,10 +10,6 @@
 
 /*
 TODO:
-fix systemListener not removed
-
-fix activation deactivation triggered together
-
 fix video changed listener
 exit program on video change
 
@@ -50,7 +46,7 @@ add go to the end
     });
 
     const deactivateShortcuts = new Action('Deactivate program', '`', function () {
-        // order is important
+        // clear state after removing action listeners
         removeActionListeners();
         addSystemListeners();
         state = clearState();
@@ -89,13 +85,11 @@ add go to the end
     }
 
     function addSystemListeners() {
-        console.log("addSystemListeners");
         document.addEventListener('keyup', systemListener);
     }
 
     function removeSystemListeners() {
-        console.log("removeSystemListeners");
-        document.addEventListener('keyup', systemListener);
+        document.removeEventListener('keyup', systemListener);
     }
 
     function systemListener(event) {
