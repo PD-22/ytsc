@@ -166,7 +166,7 @@ add go to the end
 
     function segmentListener() {
         const eventTime = state.video.element.currentTime;
-        if (!state.start || !state.end || eventTime < state.end) return;
+        if (state.start == null || state.end == null || eventTime < state.end) return;
         state.video.element.currentTime = state.start;
         console.log(`End reached: [${formatDuration(eventTime)}]\nLoad start: [${formatDuration(state.start)}]`);
     }
