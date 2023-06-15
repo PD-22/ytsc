@@ -8,13 +8,6 @@
 // @grant        none
 // ==/UserScript==
 
-/*
-TODO:
-when loop stop transfer video to the end of the loop
-save start and loop in localstorage
-add go to the end
-*/
-
 (function () {
     'use strict';
 
@@ -74,13 +67,20 @@ add go to the end
         log(`${this.name}: [${formatDuration(state.end)}]`);
     });
 
+    const loadEnd = new Action('Load end', 'e', function () {
+        if (state.end == null) return;
+        state.video.element.currentTime = state.end;
+        state.video.element.pause();
+        log(`${this.name}: [${formatDuration(state.end)}]`);
+    });
+
     const removeEnd = new Action('Remove end', 'w', function () {
         state.end = null;
         log(this.name);
     });
+    
+    const actions = [disableShortcuts, setStart, loadStart, setEnd, loadEnd, removeEnd];
     //#endregion
-
-    const actions = [disableShortcuts, setStart, loadStart, setEnd, removeEnd];
 
     run();
 
@@ -175,7 +175,7 @@ add go to the end
 
     function segmentListener() {
         const eventTime = state.video.element.currentTime;
-        if (state.start == null || state.end == null || eventTime < state.end) return;
+        if (state.start == null || state.end == null || eventTime < state.end || state.video.element.paused) return;
         state.video.element.currentTime = state.start;
         console.log(`End reached: [${formatDuration(eventTime)}]\nLoad start: [${formatDuration(state.start)}]`);
     }
