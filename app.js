@@ -10,7 +10,6 @@
 
 /*
 TODO:
-add less general logs
 disable go to start if start falsy
 fix loop before start
 when loop stop transfer video to the end of the loop
@@ -32,26 +31,26 @@ add go to the end
     }
 
     //#region Actions
-    const activateShortcuts = new Action('Activate program', '`', function () {
+    const enableShortcuts = new Action('Enable shortcuts', '`', function () {
         state = initState();
         if (state) {
             removeSystemListeners();
             addActionListeners();
             log(formatActions(), 3000);
         } else {
-            log("Program activation failed");
+            log("Shortcut activation failed");
         }
     });
 
-    const deactivateShortcuts = new Action('Deactivate program', '`', function () {
+    const disableShortcuts = new Action('Disable shortcuts', '`', function () {
         removeActionListeners();
         addSystemListeners();
         log("Shortcuts disabled", 3000);
-        // clear state at the end
+        // clear the state at the end
         state = clearState();
     });
 
-    const saveStart = new Action('Save start', 'a', function () {
+    const setStart = new Action('Set start', 'a', function () {
         state.start = state.video.element.currentTime;
         log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
     });
@@ -61,24 +60,24 @@ add go to the end
         log(`${this.name} (${formatDuration(state.start)})`);
     });
 
-    const saveLoop = new Action('Save loop', 'd', function () {
+    const setEnd = new Action('Set end', 'd', function () {
         state.end = state.video.element.currentTime;
         log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
     });
 
-    const clearLoop = new Action('Clear Loop', 'w', function () {
+    const removeEnd = new Action('Remove end', 'w', function () {
         state.end = null;
         log(this.name);
     });
     //#endregion
 
-    const actions = [deactivateShortcuts, saveStart, loadStart, saveLoop, clearLoop];
+    const actions = [disableShortcuts, setStart, loadStart, setEnd, removeEnd];
 
     run();
 
     //#region run
     function run() {
-        console.log(`Press "${activateShortcuts.key}" to activate video shortcuts`);
+        console.log(`Press "${enableShortcuts.key}" to activate video shortcuts`);
         addSystemListeners();
     }
 
@@ -91,8 +90,8 @@ add go to the end
     }
 
     function systemListener(event) {
-        if (!eventMatches(event, activateShortcuts)) return;
-        activateShortcuts.action();
+        if (!eventMatches(event, enableShortcuts)) return;
+        enableShortcuts.action();
     }
     //#endregion
 
@@ -166,15 +165,15 @@ add go to the end
     }
 
     function segmentListener() {
-        if (!state.end || state.video.element.currentTime < state.end) return;
-        const endTime = formatDuration(state.video.element.currentTime);
+        const eventTime = state.video.element.currentTime;
+        if (!state.end || eventTime < state.end) return;
         state.video.element.currentTime = state.start;
-        console.log(`Segment end (${endTime})\nLoad start (${formatDuration(state.start)})`);
+        console.log(`End reached (${formatDuration(eventTime)})\nLoad start (${formatDuration(state.start)})`);
     }
 
     function videoChangedListener() {
         const idChanged = state.video.id != getUrlVideoId();
-        if (idChanged) deactivateShortcuts.action();
+        if (idChanged) disableShortcuts.action();
     }
     //#endregion
 
