@@ -10,7 +10,6 @@
 
 /*
 TODO:
-fix loop before start
 when loop stop transfer video to the end of the loop
 save start and loop in localstorage
 add go to the end
@@ -50,8 +49,13 @@ add go to the end
     });
 
     const setStart = new Action('Set start', 'a', function () {
-        state.start = state.video.element.currentTime;
-        log(`${this.name}: [${formatDuration(state.video.element.currentTime)}]`);
+        const currentTime = state.video.element.currentTime;
+        if (state.end != null && currentTime >= state.end) {
+            log(`Cannot set start [${formatDuration(currentTime)}] after end [${formatDuration(state.end)}]`);
+            return;
+        }
+        state.start = currentTime;
+        log(`${this.name}: [${formatDuration(state.start)}]`);
     });
 
     const loadStart = new Action('Load start', 's', function () {
@@ -61,8 +65,13 @@ add go to the end
     });
 
     const setEnd = new Action('Set end', 'd', function () {
-        state.end = state.video.element.currentTime;
-        log(`${this.name}: [${formatDuration(state.video.element.currentTime)}]`);
+        const currentTime = state.video.element.currentTime;
+        if (state.start != null && currentTime <= state.start) {
+            log(`Cannot set end [${formatDuration(currentTime)}] before start [${formatDuration(state.start)}]`);
+            return;
+        }
+        state.end = currentTime;
+        log(`${this.name}: [${formatDuration(state.end)}]`);
     });
 
     const removeEnd = new Action('Remove end', 'w', function () {
