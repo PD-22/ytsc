@@ -10,7 +10,6 @@
 
 /*
 TODO:
-disable go to start if start falsy
 fix loop before start
 when loop stop transfer video to the end of the loop
 save start and loop in localstorage
@@ -52,17 +51,18 @@ add go to the end
 
     const setStart = new Action('Set start', 'a', function () {
         state.start = state.video.element.currentTime;
-        log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
+        log(`${this.name}: [${formatDuration(state.video.element.currentTime)}]`);
     });
 
     const loadStart = new Action('Load start', 's', function () {
+        if (state.start == null) return;
         state.video.element.currentTime = state.start;
-        log(`${this.name} (${formatDuration(state.start)})`);
+        log(`${this.name}: [${formatDuration(state.start)}]`);
     });
 
     const setEnd = new Action('Set end', 'd', function () {
         state.end = state.video.element.currentTime;
-        log(`${this.name} (${formatDuration(state.video.element.currentTime)})`);
+        log(`${this.name}: [${formatDuration(state.video.element.currentTime)}]`);
     });
 
     const removeEnd = new Action('Remove end', 'w', function () {
@@ -166,9 +166,9 @@ add go to the end
 
     function segmentListener() {
         const eventTime = state.video.element.currentTime;
-        if (!state.end || eventTime < state.end) return;
+        if (!state.start || !state.end || eventTime < state.end) return;
         state.video.element.currentTime = state.start;
-        console.log(`End reached (${formatDuration(eventTime)})\nLoad start (${formatDuration(state.start)})`);
+        console.log(`End reached: [${formatDuration(eventTime)}]\nLoad start: [${formatDuration(state.start)}]`);
     }
 
     function videoChangedListener() {
