@@ -9,7 +9,8 @@
             ],
             "js": [
                 "content.js",
-                "alert.js"
+                "alert.js",
+                "format.js"
             ]
         }
     ]
