@@ -8,6 +8,7 @@
                 "*://www.youtube.com/*"
             ],
             "js": [
+                "actions.js",
                 "content.js",
                 "listener.js",
                 "format.js",
