@@ -1,7 +1,7 @@
 function formatActions() {
     return [
         'Shortcuts enabled:',
-        ...actions.map(action => `\t"${action.key}" - ${action.name}`)
+        ...Object.values(actions).map(action => `\t"${action.key}" - ${action.name}`)
     ].join('\n');
 }
 

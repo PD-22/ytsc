@@ -7,8 +7,8 @@ function removeSystemListeners() {
 }
 
 function systemListener(event) {
-    if (!eventMatches(event, enableShortcuts)) return;
-    enableShortcuts.action();
+    if (!eventMatches(event, systemActions.enableShortcuts)) return;
+    systemActions.enableShortcuts.action();
 }
 
 function addActionListeners() {
@@ -24,23 +24,16 @@ function removeActionListeners() {
 }
 
 function keyListener(event) {
-    getActiveActions().forEach(action => action.action());
-
-    function getActiveActions() {
-        return actions.filter(action => eventMatches(event, action));
-    }
+    Object.values(actions)
+        .filter(action => eventMatches(event, action))
+        .forEach(action => action.action());
 }
 
 function eventMatches(event, action) {
-    return !keyModifierPressed(event) && keyMatches(event, action);
+    const keyModifierPressed = event.shiftKey || event.ctrlKey || event.altKey || event.metaKey;
+    const keyMatches = event.key.toLowerCase() === action.key;
 
-    function keyModifierPressed(event) {
-        return event.shiftKey || event.ctrlKey || event.altKey || event.metaKey;
-    }
-
-    function keyMatches(event, action) {
-        return event.key.toLowerCase() === action.key;
-    }
+    return !keyModifierPressed && keyMatches;
 }
 
 function segmentListener() {
