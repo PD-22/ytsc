@@ -9,6 +9,7 @@
             ],
             "js": [
                 "actions.js",
+                "state.js",
                 "content.js",
                 "listener.js",
                 "format.js",
