@@ -1,3 +1,16 @@
+function addSystemListeners() {
+    document.addEventListener('keyup', systemListener);
+}
+
+function removeSystemListeners() {
+    document.removeEventListener('keyup', systemListener);
+}
+
+function systemListener(event) {
+    if (!eventMatches(event, enableShortcuts)) return;
+    enableShortcuts.action();
+}
+
 function addActionListeners() {
     document.addEventListener('keyup', keyListener);
     state.video.element.addEventListener('timeupdate', segmentListener);
@@ -32,9 +45,18 @@ function eventMatches(event, action) {
 
 function segmentListener() {
     const eventTime = state.video.element.currentTime;
-    if (state.start == null || state.end == null || eventTime < state.end || state.video.element.paused) return;
+    if (
+        state.start == null ||
+        state.end == null ||
+        eventTime < state.end ||
+        state.video.element.paused
+    ) return;
+
     state.video.element.currentTime = state.start;
-    console.log(`End reached: [${formatDuration(eventTime)}]\nLoad start: [${formatDuration(state.start)}]`);
+    console.log(
+        `End reached: [${formatDuration(eventTime)}]\n` +
+        `Load start: [${formatDuration(state.start)}]`
+    );
 }
 
 function videoChangedListener() {

@@ -8,13 +8,13 @@
                 "*://www.youtube.com/*"
             ],
             "js": [
-                "actions.js",
+                "utils.js",
                 "state.js",
-                "content.js",
-                "listener.js",
-                "format.js",
                 "alert.js",
-                "utils.js"
+                "actions.js",
+                "format.js",
+                "listener.js",
+                "content.js"
             ]
         }
     ]

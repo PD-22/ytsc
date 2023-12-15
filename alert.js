@@ -1,6 +1,6 @@
-const animationDuration = 300;
+const alertTransitionDuration = 300;
 
-const styles = {
+const alertStyles = {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -13,7 +13,7 @@ const styles = {
     lineHeight: '1.5',
     opacity: '1',
     pointerEvents: 'none',
-    transition: `opacity ${animationDuration / 1000}s`,
+    transition: `opacity ${alertTransitionDuration}ms`,
     whiteSpace: 'pre-line',
     zIndex: '9999'
 };
@@ -22,13 +22,14 @@ async function alert(message, duration = 1000) {
     const alertBox = document.createElement('div');
     alertBox.textContent = message;
 
-    Object.assign(alertBox.style, styles);
+    Object.assign(alertBox.style, alertStyles);
 
     const alertContainer = state?.video?.container || document.body;
     alertContainer.appendChild(alertBox);
 
     await delay(duration);
     alertBox.style.opacity = '0';
-    await delay(animationDuration);
+
+    await delay(alertTransitionDuration);
     alertContainer.removeChild(alertBox);
 }

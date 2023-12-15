@@ -21,8 +21,7 @@ const disableShortcuts = new Action('Disable shortcuts', '`', function () {
     removeActionListeners();
     addSystemListeners();
     log("Shortcuts disabled", 3000);
-    // clear the state at the end
-    state = clearState();
+    state = null;
 });
 
 const setStart = new Action('Set start', 'a', function () {
