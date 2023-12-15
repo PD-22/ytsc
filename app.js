@@ -74,11 +74,11 @@
         log(`${this.name}: [${formatDuration(state.end)}]`);
     });
 
-    const removeEnd = new Action('Remove end', 'w', function () {
+    const removeEnd = new Action('Remove end', 'r', function () {
         state.end = null;
         log(this.name);
     });
-    
+
     const actions = [disableShortcuts, setStart, loadStart, setEnd, loadEnd, removeEnd];
     //#endregion
 
