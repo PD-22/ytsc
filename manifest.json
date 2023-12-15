@@ -9,8 +9,9 @@
             ],
             "js": [
                 "content.js",
-                "alert.js",
-                "format.js"
+                "listener.js",
+                "format.js",
+                "alert.js"
             ]
         }
     ]
