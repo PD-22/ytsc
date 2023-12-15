@@ -21,8 +21,3 @@ function systemListener(event) {
     enableShortcuts.action();
 }
 //#endregion
-
-function log(text, duration) {
-    console.log(text);
-    alert(text, duration);
-}

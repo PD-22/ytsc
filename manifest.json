@@ -13,7 +13,8 @@
                 "content.js",
                 "listener.js",
                 "format.js",
-                "alert.js"
+                "alert.js",
+                "utils.js"
             ]
         }
     ]

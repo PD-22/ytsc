@@ -32,7 +32,3 @@ async function alert(message, duration = 1000) {
     await delay(animationDuration);
     alertContainer.removeChild(alertBox);
 }
-
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
