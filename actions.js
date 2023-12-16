@@ -7,7 +7,7 @@ class Action {
 }
 
 const systemActions = {
-    enableShortcuts: new Action('Enable shortcuts', '`', () => {
+    enableShortcuts: new Action('Enable shortcuts', '`', function () {
         state = initState();
         if (state) {
             removeSystemListeners();
@@ -20,14 +20,14 @@ const systemActions = {
 };
 
 const actions = {
-    disableShortcuts: new Action('Disable shortcuts', '`', () => {
+    disableShortcuts: new Action('Disable shortcuts', '`', function () {
         removeActionListeners();
         addSystemListeners();
         log("Shortcuts disabled", 3000);
         state = null;
     }),
 
-    setStart: new Action('Set start', 'a', () => {
+    setStart: new Action('Set start', 'a', function () {
         const currentTime = state.video.element.currentTime;
         if (state.end != null && currentTime >= state.end) {
             log(`Cannot set start [${formatDuration(currentTime)}] after end [${formatDuration(state.end)}]`);
@@ -37,13 +37,13 @@ const actions = {
         log(`${this.name}: [${formatDuration(state.start)}]`);
     }),
 
-    loadStart: new Action('Load start', 's', () => {
+    loadStart: new Action('Load start', 's', function () {
         if (state.start == null) return;
         state.video.element.currentTime = state.start;
         log(`${this.name}: [${formatDuration(state.start)}]`);
     }),
 
-    setEnd: new Action('Set end', 'd', () => {
+    setEnd: new Action('Set end', 'd', function () {
         const currentTime = state.video.element.currentTime;
         if (state.start != null && currentTime <= state.start) {
             log(`Cannot set end [${formatDuration(currentTime)}] before start [${formatDuration(state.start)}]`);
@@ -53,14 +53,14 @@ const actions = {
         log(`${this.name}: [${formatDuration(state.end)}]`);
     }),
 
-    loadEnd: new Action('Load end', 'e', () => {
+    loadEnd: new Action('Load end', 'e', function () {
         if (state.end == null) return;
         state.video.element.currentTime = state.end;
         state.video.element.pause();
         log(`${this.name}: [${formatDuration(state.end)}]`);
     }),
 
-    removeEnd: new Action('Remove end', 'r', () => {
+    removeEnd: new Action('Remove end', 'r', function () {
         state.end = null;
         log(this.name);
     }),
