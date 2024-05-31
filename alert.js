@@ -18,6 +18,8 @@ const alertStyles = {
     zIndex: '9999'
 };
 
+const alertList = new Set();
+
 async function alert(message, duration = 1000) {
     const alertBox = document.createElement('div');
     alertBox.textContent = message;
@@ -27,9 +29,18 @@ async function alert(message, duration = 1000) {
     const alertContainer = state?.video?.container || document.body;
     alertContainer.appendChild(alertBox);
 
+    const remove = () => alertBox.remove();
+    alertList.add(remove);
+
     await delay(duration);
     alertBox.style.opacity = '0';
 
     await delay(alertTransitionDuration);
-    alertContainer.removeChild(alertBox);
+    alertList.delete(remove);
+    remove();
+}
+
+function clearAlerts() {
+    alertList.forEach(f => f());
+    alertList.clear();
 }

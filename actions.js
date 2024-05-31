@@ -64,4 +64,27 @@ const actions = {
         state.end = null;
         log(this.name);
     }),
+
+    skipAd: new Action('Skip Ad', 'g', function () {
+        const selector = 'button.ytp-skip-ad-button';
+        document.querySelector(selector).click();
+    }),
+
+    like: new Action('Like', 'h', function () {
+        const selector = 'like-button-view-model button';
+        document.querySelector(selector).click();
+    }),
+
+    dislike: new Action('Dislike', 'y', function () {
+        const selector = 'dislike-button-view-model button';
+        document.querySelector(selector).click();
+    }),
+
+    focus: new Action('Focus video', 'u', function () {
+        document.querySelector('video').focus()
+    }),
+
+    clean: new Action('Clean overlay', 'q', function () {
+        clearAlerts();
+    }),
 };

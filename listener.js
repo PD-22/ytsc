@@ -54,5 +54,9 @@ function segmentListener() {
 
 function videoChangedListener() {
     const idChanged = state.video.id != getUrlVideoId();
-    if (idChanged) disableShortcuts.action();
+    if (idChanged) actions.disableShortcuts.action();
+}
+
+function getUrlVideoId() {
+    return new URLSearchParams(window.location.search).get('v');
 }
