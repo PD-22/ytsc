@@ -84,7 +84,15 @@ const actions = {
         document.querySelector('video').focus()
     }),
 
-    clean: new Action('Clean overlay', 'q', function () {
+    float: new Action('Toggle float', 'b', function () {
+        if (document.pictureInPictureElement) {
+            document.exitPictureInPicture();
+        } else {
+            document.querySelector('video').requestPictureInPicture();
+        }
+    }),
+
+    clean: new Action('Clean', 'q', function () {
         clearAlerts();
     }),
 };
