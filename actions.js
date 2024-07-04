@@ -92,6 +92,22 @@ const actions = {
         }
     }),
 
+    save: new Action('Save frame', 'n', function () {
+        const video = document.querySelector('video');
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL('image/png')
+
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'frame.png';
+        link.click();
+    }),
+
     clean: new Action('Clean', 'q', function () {
         clearAlerts();
     }),
