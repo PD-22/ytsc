@@ -1,8 +1,16 @@
+const defaultModifier = {
+    shiftKey: false,
+    ctrlKey: false,
+    altKey: false,
+    metaKey: false
+};
+
 class Action {
-    constructor(name, key, action) {
+    constructor(name, key, action, modifier = defaultModifier) {
         this.name = name;
         this.key = key;
         this.action = action;
+        this.modifier = { ...defaultModifier, ...modifier };
     }
 }
 
@@ -12,7 +20,7 @@ const systemActions = {
         if (state) {
             removeSystemListeners();
             addActionListeners();
-            log(formatActions(), 3000);
+            log(`Shortcuts enabled\n\t` + formatAction(actions.remind));
         } else {
             log("Shortcut activation failed");
         }
@@ -23,7 +31,7 @@ const actions = {
     disableShortcuts: new Action('Disable shortcuts', '`', function () {
         removeActionListeners();
         addSystemListeners();
-        log("Shortcuts disabled", 3000);
+        log("Shortcuts disabled");
         state = null;
     }),
 
@@ -108,7 +116,19 @@ const actions = {
         link.click();
     }),
 
-    clean: new Action('Clean', 'q', function () {
-        clearAlerts();
+    rate: new Action('"Alt+Num" - Playback Rate', null, function (e) {
+        const rate = [.5, 1, 1.5, 2, 4, 8][e.key];
+        if (!rate) return;
+        const video = document.querySelector('video');
+        video.playbackRate = rate;
+        log(`${rate}x`);
+    }, { altKey: true }),
+
+    remind: new Action('Remind shortcuts', 'q', function (e) {
+        log(formatActions(), 5000);
     }),
+
+    clean: new Action('Close Overlays', 'z', function (e) {
+        clearAlerts();
+    })
 };

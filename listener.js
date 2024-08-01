@@ -26,14 +26,19 @@ function removeActionListeners() {
 function keyListener(event) {
     Object.values(actions)
         .filter(action => eventMatches(event, action))
-        .forEach(action => action.action());
+        .forEach(action => action.action(event));
 }
 
 function eventMatches(event, action) {
-    const keyModifierPressed = event.shiftKey || event.ctrlKey || event.altKey || event.metaKey;
-    const keyMatches = event.key.toLowerCase() === action.key;
+    const modifierMatches = (
+        event.shiftKey === action.modifier.shiftKey &&
+        event.ctrlKey === action.modifier.ctrlKey &&
+        event.altKey === action.modifier.altKey &&
+        event.metaKey === action.modifier.metaKey
+    );
+    const keyMatches = action.key === null || event.key.toLowerCase() === action.key;
 
-    return !keyModifierPressed && keyMatches;
+    return modifierMatches && keyMatches;
 }
 
 function segmentListener() {

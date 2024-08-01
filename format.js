@@ -1,8 +1,9 @@
+function formatAction({ key, name }) {
+    return key ? `"${key}" - ${name}` : `\t${name}`;
+}
+
 function formatActions() {
-    return [
-        'Shortcuts enabled:',
-        ...Object.values(actions).map(action => `\t"${action.key}" - ${action.name}`)
-    ].join('\n');
+    return Object.values(actions).map(a => '\t' + formatAction(a)).join('\n');
 }
 
 function formatDuration(totalSeconds) {
