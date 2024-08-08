@@ -124,11 +124,24 @@ const actions = {
         log(`${rate}x`);
     }, { altKey: true }),
 
-    remind: new Action('Remind shortcuts', 'q', function (e) {
+    overlay: new Action('Toggle overlay', 'p', function (e) {
+        const t = document.querySelector('.ytp-chrome-top');
+        const b = document.querySelector('.ytp-chrome-bottom');
+        const gb = document.querySelector('.ytp-gradient-bottom');
+        const gt = document.querySelector('.ytp-gradient-top');
+        if (!t || !b || !gb || !gt) return;
+        const visibility = t.style.visibility === 'hidden' ? 'visible' : 'hidden';
+        t.style.visibility = visibility;
+        b.style.visibility = visibility;
+        gb.style.visibility = visibility;
+        gt.style.visibility = visibility;
+    }),
+
+    remind: new Action('Remind shortcuts', 'z', function (e) {
         log(formatActions(), 5000);
     }),
 
-    clean: new Action('Close Overlays', 'z', function (e) {
+    clean: new Action('Close Overlays', 'q', function (e) {
         clearAlerts();
     })
 };
