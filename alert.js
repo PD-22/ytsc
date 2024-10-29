@@ -20,13 +20,18 @@ const alertStyles = {
 
 const alertList = new Set();
 
-async function alert(message, duration = 1000) {
+async function alert(message, duration = 1000, id) {
     const alertBox = document.createElement('div');
     alertBox.textContent = message;
+    alertBox.id = id;
 
     Object.assign(alertBox.style, alertStyles);
 
-    const alertContainer = state?.video?.container || document.body;
+    const container = document
+        .querySelector('video.html5-main-video')
+        ?.parentElement?.parentElement;
+    const alertContainer = state?.video?.container || container || document.body;
+    if (id) alertContainer.querySelector(`#${id}`)?.remove();
     alertContainer.appendChild(alertBox);
 
     const remove = () => alertBox.remove();
