@@ -20,6 +20,7 @@ const systemActions = {
         if (state) {
             removeSystemListeners();
             addActionListeners();
+            localStorage.setItem('shortcutsEnabled', 'true');
             log(`Shortcuts enabled\n\t` + formatAction(actions.remind));
         } else {
             log("Shortcut activation failed");
@@ -31,6 +32,7 @@ const actions = {
     disableShortcuts: new Action('Disable shortcuts', '`', function () {
         removeActionListeners();
         addSystemListeners();
+        localStorage.setItem('shortcutsEnabled', 'false');
         log("Shortcuts disabled");
         state = null;
     }),
