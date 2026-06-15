@@ -1,26 +1,14 @@
-function addSystemListeners() {
-    document.addEventListener('keyup', systemListener);
-}
-
-function removeSystemListeners() {
-    document.removeEventListener('keyup', systemListener);
-}
-
-function systemListener(event) {
-    if (!eventMatches(event, systemActions.enableShortcuts)) return;
-    systemActions.enableShortcuts.action();
-}
-
 function addActionListeners() {
+    if (!state || !state.video || !state.video.element) return;
     document.addEventListener('keyup', keyListener);
     state.video.element.addEventListener('timeupdate', segmentListener);
-    document.addEventListener('yt-navigate-finish', videoChangedListener);
 }
 
 function removeActionListeners() {
     document.removeEventListener('keyup', keyListener);
-    state.video.element.removeEventListener('timeupdate', segmentListener);
-    document.removeEventListener('yt-navigate-finish', videoChangedListener);
+    if (state?.video?.element) {
+        state.video.element.removeEventListener('timeupdate', segmentListener);
+    }
 }
 
 function keyListener(event) {
@@ -55,13 +43,4 @@ function segmentListener() {
         `End reached: [${formatDuration(eventTime)}]\n` +
         `Load start: [${formatDuration(state.start)}]`
     );
-}
-
-function videoChangedListener() {
-    const idChanged = state.video.id != getUrlVideoId();
-    if (idChanged) actions.disableShortcuts.action();
-}
-
-function getUrlVideoId() {
-    return new URLSearchParams(window.location.search).get('v');
 }

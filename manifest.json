@@ -11,8 +11,8 @@
                 "utils.js",
                 "state.js",
                 "alert.js",
-                "actions.js",
                 "format.js",
+                "actions.js",
                 "listener.js",
                 "content.js"
             ]

@@ -14,29 +14,7 @@ class Action {
     }
 }
 
-const systemActions = {
-    enableShortcuts: new Action('Enable shortcuts', '`', function () {
-        state = initState();
-        if (state) {
-            removeSystemListeners();
-            addActionListeners();
-            localStorage.setItem('shortcutsEnabled', 'true');
-            log(`Shortcuts enabled\n\t` + formatAction(actions.remind));
-        } else {
-            log("Shortcut activation failed");
-        }
-    })
-};
-
 const actions = {
-    disableShortcuts: new Action('Disable shortcuts', '`', function () {
-        removeActionListeners();
-        addSystemListeners();
-        localStorage.setItem('shortcutsEnabled', 'false');
-        log("Shortcuts disabled");
-        state = null;
-    }),
-
     setStart: new Action('Set start', 'a', function () {
         const currentTime = state.video.element.currentTime;
         if (state.end != null && currentTime >= state.end) {
@@ -73,11 +51,6 @@ const actions = {
     removeEnd: new Action('Remove end', 'r', function () {
         state.end = null;
         log(this.name);
-    }),
-
-    skipAd: new Action('Skip Ad', 'g', function () {
-        const selector = 'button.ytp-skip-ad-button';
-        document.querySelector(selector).click();
     }),
 
     like: new Action('Like', 'h', function () {
@@ -123,27 +96,34 @@ const actions = {
         if (!rate) return;
         const video = document.querySelector('video');
         video.playbackRate = rate;
-        log(`${rate}x`);
+        log(`${rate.toFixed(1)}x`, undefined, 'alert-rate');
     }, { altKey: true }),
 
     overlay: new Action('Toggle overlay', 'p', function (e) {
-        const t = document.querySelector('.ytp-chrome-top');
-        const b = document.querySelector('.ytp-chrome-bottom');
-        const gb = document.querySelector('.ytp-gradient-bottom');
-        const gt = document.querySelector('.ytp-gradient-top');
-        if (!t || !b || !gb || !gt) return;
-        const visibility = t.style.visibility === 'hidden' ? 'visible' : 'hidden';
-        t.style.visibility = visibility;
-        b.style.visibility = visibility;
-        gb.style.visibility = visibility;
-        gt.style.visibility = visibility;
+        const selectors = [
+            '.ytp-chrome-top',
+            '.ytp-chrome-bottom',
+            '.ytp-gradient-bottom',
+            '.ytp-gradient-top',
+            '.ytp-chrome-top-buttons',
+            '.ytp-ce-element',
+            '.ytp-paid-content-overlay',
+            '.ytp-fullscreen-metadata',
+            '.ytp-fullscreen-quick-actions',
+            '.ytp-overlay-inline-container',
+        ];
+
+        selectors.forEach(s => {
+            const e = document.querySelector(s);
+            if (!e) return;
+            const visibility = e.style.visibility === 'hidden' ? 'visible' : 'hidden';
+            e.style.visibility = visibility;
+        });
     }),
 
     remind: new Action('Remind shortcuts', 'z', function (e) {
-        log(formatActions(), 5000);
+        const existing = document.querySelector('#shortcuts-reminder');
+        if (existing) return void existing.remove();
+        log(formatActions(), 0, 'shortcuts-reminder');
     }),
-
-    clean: new Action('Close Overlays', 'q', function (e) {
-        clearAlerts();
-    })
 };

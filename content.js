@@ -2,25 +2,28 @@ let state = null;
 let holding = false;
 let preSpeed = 1;
 
-console.log(`Press "${systemActions.enableShortcuts.key}" to activate video shortcuts`);
-addSystemListeners();
+function activate() {
+    state = initState();
+    if (!state) return void console.log("Shortcut activation failed");
+    addActionListeners();
+}
 
-if (localStorage.getItem('shortcutsEnabled') === 'true') 
-    systemActions.enableShortcuts.action();
+activate();
 
 document.addEventListener('keydown', event => {
     if (event.code !== 'Enter' || holding) return;
+
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    const isEditable = document.activeElement?.isContentEditable;
+    if (tag === 'input' || tag === 'textarea' || isEditable) return;
 
     console.log('Holding');
     document.querySelector('button.ytp-skip-ad-button')?.focus();
     document.querySelector('#dismiss-button')?.click();
 
-    const classList = document.activeElement.classList;
-    if (!classList.contains('html5-video-player')) return;
-
     const video = document.querySelector('video');
     
-    preSpeed = video.playbackRate; 
+    preSpeed = video.playbackRate;
     
     video.play();
     video.playbackRate = 8;
@@ -32,12 +35,16 @@ document.addEventListener('keyup', event => {
     if (event.code !== 'Enter' || !holding) return;
 
     console.log('Released');
-    document.getElementsByClassName('html5-video-player')[0]?.focus();
 
     const video = document.querySelector('video');
     
-    video.playbackRate = preSpeed; 
+    video.playbackRate = preSpeed;
     
     clearAlerts();
     holding = false;
+});
+
+document.addEventListener('yt-navigate-finish', () => {
+    removeActionListeners();
+    activate();
 });

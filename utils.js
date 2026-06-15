@@ -1,6 +1,6 @@
-function log(text, duration) {
+function log(text, duration, id) {
     console.log(text);
-    alert(text, duration);
+    alert(text, duration, id);
 }
 
 function delay(ms) {

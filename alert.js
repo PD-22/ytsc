@@ -20,6 +20,11 @@ const alertStyles = {
 
 const alertList = new Set();
 
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') clearAlerts();
+    if (e.altKey && !isNaN(e.key)) e.preventDefault();
+});
+
 async function alert(message, duration = 1000, id) {
     const alertBox = document.createElement('div');
     alertBox.textContent = message;
@@ -36,6 +41,8 @@ async function alert(message, duration = 1000, id) {
 
     const remove = () => alertBox.remove();
     alertList.add(remove);
+
+    if (!duration) return;
 
     await delay(duration);
     alertBox.style.opacity = '0';
