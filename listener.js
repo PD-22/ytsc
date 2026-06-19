@@ -11,7 +11,31 @@ function removeActionListeners() {
     }
 }
 
+function isEditableElement(element) {
+    if (!element) return false;
+    
+    const tagName = element.tagName.toLowerCase();
+    if (tagName === 'input' || tagName === 'textarea') {
+        return true;
+    }
+    
+    if (element.isContentEditable) {
+        return true;
+    }
+    
+    if (element.getAttribute('role') === 'textbox' || 
+        element.getAttribute('role') === 'searchbox') {
+        return true;
+    }
+    
+    return false;
+}
+
 function keyListener(event) {
+    if (isEditableElement(event.target)) {
+        return;
+    }
+    
     Object.values(actions)
         .filter(action => eventMatches(event, action))
         .forEach(action => action.action(event));
