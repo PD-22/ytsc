@@ -10,12 +10,41 @@ function activate() {
 
 activate();
 
+function shouldSpeedUpOnEnter(element) {
+    if (!element) return false;
+    
+    const tag = element.tagName?.toLowerCase();
+    const role = element.getAttribute('role');
+    const isContentEditable = element.isContentEditable;
+    
+    if (tag === 'input' || 
+        tag === 'textarea' || 
+        tag === 'select' || 
+        tag === 'button' ||
+        isContentEditable ||
+        role === 'button' ||
+        role === 'link' ||
+        role === 'textbox' ||
+        role === 'searchbox' ||
+        role === 'menuitem' ||
+        role === 'tab') {
+        return false;
+    }
+    
+    return true;
+}
+
 document.addEventListener('keydown', event => {
+    if (event.code === 'Escape') {
+        if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+        }
+        return;
+    }
+    
     if (event.code !== 'Enter' || holding) return;
 
-    const tag = document.activeElement?.tagName?.toLowerCase();
-    const isEditable = document.activeElement?.isContentEditable;
-    if (tag === 'input' || tag === 'textarea' || isEditable) return;
+    if (!shouldSpeedUpOnEnter(document.activeElement)) return;
 
     console.log('Holding');
     document.querySelector('button.ytp-skip-ad-button')?.focus();
